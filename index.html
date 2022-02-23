@@ -11,9 +11,23 @@
         <h1 class="display-4">Send Message</h1>
         <br />
         <input class="form-control" placeholder="Name">
-        <button class="btn btn-sucecss">Send</button>
-        
+        <br />
+        <button id="send" class="btn btn-success" onclick="">Send</button>
+    </div> 
 
+    <div id="message">
     </div>
 
 </div>
+<script>
+    $(() => {
+        $("#send").click(() =>{
+            console.log('loaded')
+        addMessages({name:'Simarjeet' , message:'Hey'})
+
+        })
+    })
+    function addMessages(message){
+    $("#message").append(`<h4> ${message.name}</h4> <p>${message.message}</p>`)
+}
+</script>
