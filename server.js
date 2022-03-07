@@ -8,47 +8,50 @@ const { response } = require('express')
 app.use(express.static(__dirname))
 app.use(bodyParser.json())  //app knows we are parsing the body
 app.use(bodyParser.urlencoded({extended:false}))  
- var promise = Promise
+var promise = Promise
 var dbUrl = 'mongodb+srv://Simarjeet:Simarjeet@learningnode.6o8wr.mongodb.net/LearningNode'
 var Message = mongoose.model("Message", {
     name: String,
     message:String
 })
-var messages = [
+ var messages = [
     {name:'Tim', message: 'Hey'},
     {name:'Simar', message: 'Hello!!'}
-]
-app.get('/messages', (req, res) => {
+ ]
+    app.get('/messages', (req, res) => {    
     Message.find({},(err, messages) =>{
         res.send(messages)
+        })
     })
-})
-app.post('/messages' , (req, res) =>{
-    var message = new Message(req.body)
-    message .save()
-    .then(() => {
-    console.log('saved')
-    return Message.findOne({message: 'badword'})
+    app.post('/messages' , async (req, res) =>{
+        var message = new Message(req.body)
 
-    }).then(censored => {
+        var savedMessage = await message.save()
+    
+        console.log('saved')
+
+        var censored = await Message.findOne({message: 'badword'})
+
         if(censored) {
-            console.log('Censored words found', censored)
-            return Message.remove({_id: censored.id})
+            await Message.remove({_id: censored.id})
         }
-        io.emit('message', req.body)
-        res.sendStatus(200)
-    }).catch((err)=>{
-        res.sendStatus(500)
-        return console.error(err)
-    })
-})
-io.on('connection', (socket) =>{
-    console.log("a user connected")
-})
- mongoose.connect(dbUrl, (err) =>{
-     console.log('mongo connected', err)
- })
-var server = http.listen(3000, () => {
-    console.log('The server is running on port',server.address().port)
-})
+        
+        else
+            io.emit('message', req.body)
 
+        res.sendStatus(200)
+
+     //  .catch((err)=>{
+     //   res.sendStatus(500)
+       // return console.error(err)
+     //})
+    })
+io.on('connection', (socket) =>{
+console.log("a user connected")
+    })
+mongoose.connect(dbUrl, (err) =>{
+console.log('mongo connected', err)
+    })
+var server = http.listen(3000, () => {
+console.log('The server is running on port',server.address().port)
+    })
