@@ -6,45 +6,46 @@ var io = require('socket.io')(http)
 var mongoose = require('mongoose')
 const { response } = require('express')
 app.use(express.static(__dirname))
-app.use(bodyParser.json())  //app knows we are parsing the body
+app.use(bodyParser.json())  //EXPECTS body parser knows we are parsing the json with http request
 app.use(bodyParser.urlencoded({extended:false}))  
-var promise = Promise
+mongoose.Promise = Promise
 var dbUrl = 'mongodb+srv://Simarjeet:Simarjeet@learningnode.6o8wr.mongodb.net/LearningNode'
 var Message = mongoose.model("Message", {
     name: String,
     message:String
 })
- var messages = [
-    {name:'Tim', message: 'Hey'},
-    {name:'Simar', message: 'Hello!!'}
- ]
+ 
     app.get('/messages', (req, res) => {    
-    Message.find({},(err, messages) =>{
-        res.send(messages)
+        Message.find({},(err, messages) =>{
+            res.send(messages)
         })
     })
-    app.post('/messages' , async (req, res) =>{
-        var message = new Message(req.body)
-
-        var savedMessage = await message.save()
     
-        console.log('saved')
+    app.post('/messages' , async (req, res) =>{
+        try{
+            throw("SOme error")
+                    var message = new Message(req.body)
 
-        var censored = await Message.findOne({message: 'badword'})
-
-        if(censored) {
-            await Message.remove({_id: censored.id})
-        }
+                    var savedMessage = await message.save()
         
-        else
-            io.emit('message', req.body)
+                    console.log('saved')
 
-        res.sendStatus(200)
+                    var censored = await Message.findOne({message: 'badword'})
 
-     //  .catch((err)=>{
-     //   res.sendStatus(500)
-       // return console.error(err)
-     //})
+                    if(censored) {
+                    await Message.remove({_id: censored.id})
+                    }
+            
+                else{
+                    io.emit('message', req.body)
+
+                    es.sendStatus(200)
+                 }
+             }
+                catch(error){
+                 res.sendStatus(500)
+                 return console.error(error)
+                }
     })
 io.on('connection', (socket) =>{
 console.log("a user connected")
