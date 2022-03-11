@@ -23,7 +23,6 @@ var Message = mongoose.model("Message", {
     
     app.post('/messages' , async (req, res) =>{
         try{
-            throw("SOme error")
                     var message = new Message(req.body)
 
                     var savedMessage = await message.save()
@@ -39,12 +38,15 @@ var Message = mongoose.model("Message", {
                 else{
                     io.emit('message', req.body)
 
-                    es.sendStatus(200)
+                    res.sendStatus(200)
                  }
              }
                 catch(error){
                  res.sendStatus(500)
                  return console.error(error)
+                }
+                finally{
+                    console.log("Using Post")
                 }
     })
 io.on('connection', (socket) =>{
